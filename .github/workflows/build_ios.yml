@@ -2,42 +2,36 @@ name: Build iOS IPA
 
 on:
   push:
-    branches: [ "main" ]
-  workflow_dispatch:
+    branches: [ "main", "master" ]
 
 jobs:
   build_ios:
-    name: Build iOS IPA
     runs-on: macos-latest
-
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-          # You can specify a version if strictly needed, e.g., '3.16.0'
-
-      - name: Install Dependencies
+      
+      - name: Get dependencies
         run: flutter pub get
 
-      - name: Build iOS No-Codesign
+      # --- C'est ici que la magie opère ---
+      - name: Update iOS Deployment Target to 15.0
+        run: |
+          sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = [0-9.]*/IPHONEOS_DEPLOYMENT_TARGET = 15.0/g' ios/Runner.xcodeproj/project.pbxproj
+          grep -r "IPHONEOS_DEPLOYMENT_TARGET" ios/Runner.xcodeproj/project.pbxproj
+      # ------------------------------------
+
+      - name: Build iOS (No Sign)
         run: |
           flutter build ios --release --no-codesign
-
-      - name: Create IPA (Payload)
-        run: |
-          mkdir Payload
-          # The built app is located in build/ios/iphoneos/Runner.app
+          mkdir -p Payload
           mv build/ios/iphoneos/Runner.app Payload
-          # Zip the Payload folder to create the .ipa
           zip -r FidelyKey.ipa Payload
 
-      - name: Upload IPA Artifact
-        uses: actions/upload-artifact@v4
+      - name: Upload IPA
+        uses: actions/upload-artifact@v3
         with:
           name: FidelyKey-IPA
           path: FidelyKey.ipa
-          retention-days: 5
