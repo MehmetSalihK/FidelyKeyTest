@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/utils/uri_parser.dart';
-import '../../providers/totp_provider.dart';
+import '../../core/utils/uri_parser.dart';
+import '../providers/totp_provider.dart';
 
 class ScanQrScreen extends ConsumerStatefulWidget {
   const ScanQrScreen({super.key});

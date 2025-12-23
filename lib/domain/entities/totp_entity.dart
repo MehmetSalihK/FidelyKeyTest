@@ -11,9 +11,26 @@ class TotpEntity {
     required this.issuer,
     required this.accountName,
     required this.secret,
-    required this.currentCode,
-    required this.progress,
+    this.currentCode = '',
+    this.progress = 0.0,
   });
+
+  TotpEntity copyWith({
+    String? issuer,
+    String? accountName,
+    String? secret,
+    String? currentCode,
+    double? progress,
+  }) {
+    return TotpEntity(
+      id: id,
+      issuer: issuer ?? this.issuer,
+      accountName: accountName ?? this.accountName,
+      secret: secret ?? this.secret,
+      currentCode: currentCode ?? this.currentCode,
+      progress: progress ?? this.progress,
+    );
+  }
 
   Map<String, dynamic> toJson() {
     return {
