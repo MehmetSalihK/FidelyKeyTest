@@ -8,7 +8,9 @@ jobs:
   build_ios:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
+      # Mise à jour vers v4 ici
+      - uses: actions/checkout@v4
+      
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
@@ -16,12 +18,11 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      # --- C'est ici que la magie opère ---
+      # Correction obligatoire pour Firebase (iOS 15.0)
       - name: Update iOS Deployment Target to 15.0
         run: |
           sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = [0-9.]*/IPHONEOS_DEPLOYMENT_TARGET = 15.0/g' ios/Runner.xcodeproj/project.pbxproj
           grep -r "IPHONEOS_DEPLOYMENT_TARGET" ios/Runner.xcodeproj/project.pbxproj
-      # ------------------------------------
 
       - name: Build iOS (No Sign)
         run: |
@@ -30,8 +31,9 @@ jobs:
           mv build/ios/iphoneos/Runner.app Payload
           zip -r FidelyKey.ipa Payload
 
+      # C'est ici que l'erreur était : on passe à v4
       - name: Upload IPA
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: FidelyKey-IPA
           path: FidelyKey.ipa
